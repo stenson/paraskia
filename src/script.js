@@ -26,8 +26,9 @@ ckLoaded.then((ck) => {
   // surface.drawOnce(draw);
 });
 
-const robotoURL = "https://storage.googleapis.com/skia-cdn/google-web-fonts/Roboto-Black.ttf";
-const emojiURL = "https://storage.googleapis.com/skia-cdn/misc/NotoColorEmoji.ttf";
+//const robotoURL = "https://storage.googleapis.com/skia-cdn/google-web-fonts/Roboto-Black.ttf"
+const textFontURL = "/jobclarendon.ttf"
+const emojiURL = "https://storage.googleapis.com/skia-cdn/misc/NotoColorEmoji.ttf"
 
 export const FONT_CACHE = {}
 
@@ -60,13 +61,18 @@ class Font {
 var PARAGRAPH = null;
 
 async function run() {
-  let fonts = await Font.Cacheables([robotoURL, emojiURL])
+  let fonts = await Font.Cacheables([textFontURL, emojiURL])
+
+  const tyf = Typr.parse(fonts[0].buffer)[0]
+  const tyf2 = Typr.parse(fonts[1].buffer)[0]
+  console.log(tyf, tyf2)
+
   const fontMgr = Font.ManagerFromCache()
 
   const paraStyle = new CanvasKit.ParagraphStyle({
     textStyle: {
       color: CanvasKit.BLACK,
-      fontFamilies: ['Roboto', 'Noto Color Emoji'],
+      fontFamilies: [tyf.name.fontFamily, 'Noto Color Emoji'],
       fontSize: 40,
     },
     strutStyle: {
@@ -88,7 +94,7 @@ async function run() {
     throw 'Could not make surface';
   }
 
-  let str = "Hello world 🍔. This is some text that should be long enough to require some kind of line-breaking, wouldn’t that be nice."
+  let str = "Hello world 🍔. This is some text that should be long enough to require some kind of line-breaking, wouldn’t that be nice. 🗺"
 
   const pairs = (vector) => vector.reduce((acc, v, i) => i%2==1 ? [...acc.slice(0, -1), [...acc.slice(-1), v]] : [...acc, v], [])
 
@@ -109,20 +115,12 @@ async function run() {
     let wrapTo = canv.clientWidth
     paragraph.layout(wrapTo)
 
-    //canvas.drawParagraph(paragraph, 0, 0)
+    canvas.drawParagraph(paragraph, 0, 0)
 
     const liner = new CanvasKit.Paint()
     liner.setStyle(CanvasKit.PaintStyle.Stroke)
     liner.setAntiAlias(true)
     liner.setColor([1, 0, 1, 0.3])
-
-    //const tf = CanvasKit.Typeface.MakeFreeTypeFaceFromData(fonts[0].buffer)
-    //const tff = new CanvasKit.Font(tf, 40)
-
-    console.log(fonts[0])
-
-    const tyf = Typr.parse(fonts[0].buffer)[0]
-    console.log(tyf)
 
     paragraph.getShapedLines().map(line => {
       liner.setColor([1, 0, 1, 0.3])
@@ -143,19 +141,26 @@ async function run() {
 
           let path = Typr.U.glyphToPath(tyf, g)
 
+          //console.log(tyf["glyf"][g])
+
+          const cp = str.codePointAt(run.offsets[i])
+          if (cp) {
+            const glyph = String.fromCodePoint(cp)
+            const tyfGlyph = Typr.U.codeToGlyph(tyf, cp)
+            if (tyfGlyph) {
+            } else {
+              console.log(cp, glyph)
+              path = Typr.U.glyphToPath(tyf2, g)
+            }
+          }
+
           if (i >= 0) {
             let pathdata = Typr.U.pathToSVG(path)
             let pathel = makeSVG("path")
             pathel.setAttribute("d", pathdata)
-            pathel.style.transform = `translate(${x}px, ${y}px) scale(0.02,-0.02)`
+            pathel.style.transform = `translate(${x}px, ${y}px) scale(0.04,-0.04)`
             svgs.appendChild(pathel)
           }
-
-          // const cp = str.codePointAt(run.offsets[i])
-          // if (cp) {
-          //   const glyph = String.fromCodePoint(cp)
-          //   //console.log(cp, glyph)
-          // }
         })
 
         let [x, y] = positions.slice(-1)[0]
