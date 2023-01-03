@@ -27,7 +27,7 @@ ckLoaded.then((ck) => {
 });
 
 //const robotoURL = "https://storage.googleapis.com/skia-cdn/google-web-fonts/Roboto-Black.ttf"
-const textFontURL = "/jobclarendon.ttf"
+const textFontURL = "/fonts/kass.ttf"
 const emojiURL = "https://storage.googleapis.com/skia-cdn/misc/NotoColorEmoji.ttf"
 
 export const FONT_CACHE = {}
@@ -76,7 +76,7 @@ async function run() {
       fontSize: 40,
     },
     strutStyle: {
-      leading: 2,
+      leading: 20,
       strutEnabled: true,
     },
     textAlign: CanvasKit.TextAlign.Left,
@@ -94,7 +94,9 @@ async function run() {
     throw 'Could not make surface';
   }
 
-  let str = "Hello world 🍔. This is some text that should be long enough to require some kind of line-breaking, wouldn’t that be nice. 🗺"
+  //let str = "Hello world 🍔. This is some text that should be long enough to require some kind of line-breaking, wouldn’t that be nice. 🗺"
+
+  let str = "Hello world. This is some text that should be long enough to require some kind of line-breaking, wouldn’t that be nice."
 
   const pairs = (vector) => vector.reduce((acc, v, i) => i%2==1 ? [...acc.slice(0, -1), [...acc.slice(-1), v]] : [...acc, v], [])
 
